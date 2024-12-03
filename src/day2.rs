@@ -1,12 +1,12 @@
 
 
-fn is_safe(nums: Vec<i32>, allow_replace: bool ) -> bool {
+fn is_safe(nums: Vec<i32>, _allow_replace: bool ) -> bool {
     const MIN_DIFF: i32 = 1;
     const MAX_DIFF: i32 = 3;
     let mut dir = 0;
     let mut last = -1;
     for n in nums {
-        if (last < 0) { last = n; continue; }
+        if last < 0 { last = n; continue; }
         let diff: i32 = n - last;
         if diff.abs() < MIN_DIFF { return false; }
         if diff.abs() > MAX_DIFF { return false; }
@@ -20,7 +20,7 @@ fn is_safe(nums: Vec<i32>, allow_replace: bool ) -> bool {
 
 }
 
-fn is_safe_line(line : &String, allow_replace: bool) -> bool {
+fn is_safe_line(line : &String, _allow_replace: bool) -> bool {
     let nums = line.split_ascii_whitespace();
     let mut numvec: Vec<i32> = Vec::new();
     for n in nums {
@@ -48,8 +48,6 @@ fn is_safe_line(line : &String, allow_replace: bool) -> bool {
 
 pub fn process_lines(lines:Vec<String>) -> u64 {
 
-    let mut one: Vec<u64> = Vec::new();
-    let mut two: Vec<u64> = Vec::new();
 
 
     let mut sum = 0;
