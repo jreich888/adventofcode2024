@@ -10,7 +10,7 @@ fn is_safe(nums: Vec<i32>, allow_replace: bool ) -> bool {
         let diff: i32 = n - last;
         if diff.abs() < MIN_DIFF { return false; }
         if diff.abs() > MAX_DIFF { return false; }
-        let diffsign = diff==0 ? 0 : diff / diff.abs();
+        let diffsign = diff / diff.abs();
         println!("  {last} {n} {diff} {dir} {diffsign}");
         if dir == 0 { dir = diffsign; }
         if diffsign != dir {return false; }
@@ -29,14 +29,14 @@ fn is_safe_line(line : &String, allow_replace: bool) -> bool {
 
 
         
-    let initial_safe = is_safe(numvec.clone());
+    let initial_safe = is_safe(numvec.clone(), false);
     if initial_safe { return true; }
 
     // Ok, start to clone and split the lines
     for n in 0..numvec.len() {
         let mut tvec = numvec.clone();
         tvec.remove(n);
-        let subsafe = is_safe(tvec);
+        let subsafe = is_safe(tvec, false);
         println!( "  subsafe {n} is {subsafe}");
         if subsafe { return true; }
     }
@@ -46,7 +46,7 @@ fn is_safe_line(line : &String, allow_replace: bool) -> bool {
 
 }
 
-fn process_lines(lines:Vec<String>) -> u64 {
+pub fn process_lines(lines:Vec<String>) -> u64 {
 
     let mut one: Vec<u64> = Vec::new();
     let mut two: Vec<u64> = Vec::new();
@@ -65,13 +65,11 @@ fn process_lines(lines:Vec<String>) -> u64 {
 
 }
 
-fn day2(lines:Vec<String>) {
+pub fn day2(lines:Vec<String>) {
     println!("Hello, world!");
     
     let result = process_lines(lines);
 
     println!("Result of file is: {result} ");
-
-
 
 }

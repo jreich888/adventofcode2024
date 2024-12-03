@@ -10,7 +10,7 @@ use std::io;
 use std::collections::HashMap;
 use regex::Regex;
 
-// use day2;
+pub mod day2;
 pub mod day3;
 
 fn read_lines(filename: impl AsRef<Path>) -> Vec<String> {
@@ -129,116 +129,15 @@ fn findlastnum(line: String) -> u32 {
 }
 
 
-fn is_safe(nums: Vec<i32>, _allow_replace: bool ) -> bool {
-    const MIN_DIFF: i32 = 1;
-    const MAX_DIFF: i32 = 3;
-    let mut dir = 0;
-    let mut last = -1;
-    for n in nums {
-        if (last < 0) { last = n; continue; }
-        let diff: i32 = n - last;
-        let mut diffsign = 0;
-        if diff!=0 { diffsign = diff / diff.abs() }
-        println!("  {last} {n} {diff} {dir} {diffsign}");
-        if dir == 0 { dir = diffsign; }
-
-        // failure cases
-        if diff.abs() < MIN_DIFF { return false; }
-        if diff.abs() > MAX_DIFF { return false; }
-        if diffsign != dir {return false; }
-
-        last = n;
-    }
-    return true;
-
-}
-
-fn is_safe_line(line : &String, _allow_replace: bool) -> bool {
-    let nums = line.split_ascii_whitespace();
-    let mut numvec: Vec<i32> = Vec::new();
-    for n in nums {
-        numvec.push(n.parse().expect("parse error"));
-    }
 
 
-        
-    let initial_safe = is_safe(numvec.clone(), false);
-    if initial_safe { return true; }
-
-    // Ok, start to clone and split the lines
-    for n in 0..numvec.len() {
-        let mut tvec = numvec.clone();
-        tvec.remove(n);
-        let subsafe = is_safe(tvec, false);
-        println!( "  subsafe {n} is {subsafe}");
-        if subsafe { return true; }
-    }
-
-    return false;
-
-
-}
-
-
-fn xxxprocess_lines(lines:Vec<String>) -> u64 {
-
-    let re = Regex::new(r"mul\(([0-9]{1,3}),([0-9]{1,3})\)").unwrap();
-    
-    let re = Regex::new(r"do\(\)|don't\(\)|mul\(([0-9]{1,3}),([0-9]{1,3})\)").unwrap();
-
-    let mut sum = 0;
-    for orig in lines {
-        println!("orig: {orig}");
-
-        let mults: Vec<(&str,i32, i32)> = re.
-            captures_iter(&orig).
-            map(|caps| {
-                // println!("{}", caps.);
-                let all = caps.get(0).expect("err x").as_str();
-                // println!("found: {all}");
-                let mut x = 0;
-                let mut y = 0;
-                if all.starts_with("mul") {
-                    x = caps.get(1)
-                        .unwrap()
-                        .as_str().
-                        parse().
-                        expect("0");
-                    y =  caps.get(2).expect("err y").as_str().parse().expect("parse x");
-                }
-                // let (_, [x,y]) = caps.extract();
-                println!("found: {all} {x} {y} ");
-                (all,x,y)
-            }).collect();
-
-            static mut running : bool = true;
-
-            unsafe {
-            for c in mults {
-                if c.0.starts_with("don't(") { running = false }
-                if c.0.starts_with("do(") { running = true }
-                println!("  mult: {} running={running} {} {} ",c.0,c.1, c.2);
-                if running {
-                    sum += c.1 * c.2;
-                }
-            }
-        }
-        println!("--");
-        // if safe { sum += 1; }
-
-    }
-    return sum as u64;
-
-}
 
 fn main() {
     println!("Hello, world!");
     let lines = read_lines("./input/sample1.txt");
-    let lines = read_lines("./input/sample2.txt");
+    // let lines = read_lines("./input/sample2.txt");
     // let lines = read_lines("./input/input_1.txt");
 
-    let result = day3::process_lines(lines);
+    let result = day2::process_lines(lines);
     println!("Result of file is: {result} ");
-
-
 }
