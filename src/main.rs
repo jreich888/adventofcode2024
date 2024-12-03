@@ -7,6 +7,7 @@ use std::{
 
 pub mod day2;
 pub mod day3;
+pub mod day4;
 
 fn read_lines(filename: impl AsRef<Path>) -> Vec<String> {
     let file = File::open(filename).expect("no such file");
@@ -25,10 +26,11 @@ fn read_lines(filename: impl AsRef<Path>) -> Vec<String> {
 
 fn main() {
     println!("Hello, world!");
-    let lines = read_lines("./input/day02/sample1.txt");
-    // let lines = read_lines("./input/day02/sample2.txt");
-    // let lines = read_lines("./input/day02/input_1.txt");
+    let inputday : &str = "day04";
+    let lines = read_lines(format!("./input/{inputday}/sample1.txt"));
+    // let lines = read_lines("./input/" + inputday + "/sample2.txt");
+    // let lines = read_lines("./input/" + inputday + "/input_1.txt");
 
-    let result = day2::process_lines(lines);
+    let result = day4::process_lines(lines);
     println!("Result of file is: {result} ");
 }

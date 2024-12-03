@@ -2,119 +2,149 @@
 use std::{
     fs::File,
     io::{prelude::*, BufReader},
-    path::{absolute, Path}, str::SplitAsciiWhitespace,
+    path::{absolute, Path},
 };
-use rand::Rng;
 use std::char;
 use std::cmp::Ordering;
 use std::io;
 use std::collections::HashMap;
-use regex::Regex;
+
+fn read_lines(filename: impl AsRef<Path>) -> Vec<String> {
+    let file = File::open(filename).expect("no such file");
+    let buf = BufReader::new(file);
+    buf.lines()
+        .map(|l| l.expect("Could not parse line"))
+        .collect()
+}
 
 
-// NOTE: I think all this code is from 2023 Day 1
-
-fn preprocess_line(line: String) -> String {
-    let mut working = String::from(line.clone());
 
 
 
-    working = working.replace("zero","0")
-        .replace("one","1")
-        .replace("two","2")
-        .replace("three","3")
-        .replace("four","4")
-        .replace("five","5")
-        .replace("six","6")
-        .replace("seven","7")
-        .replace("eight","8")
-        .replace("nine","9");
-    // if !line.eq(&working) {
-        // println!("line has been modified: from {line} to {working}");
+
+
+
+
+
+
+fn process_lines(lines:Vec<String>) -> u64 {
+
+    let mut one: Vec<u64> = Vec::new();
+    let mut two: Vec<u64> = Vec::new();
+
+
+    let mut sum = 0;
+    for orig in lines {
+        println!("orig: {orig}");
+
+        // let nums = orig.split_ascii_whitespace().map(|s| s.parse());
+        let nums = orig.split_ascii_whitespace();
+        for n in nums {  println!("  n: {n}"); }
+
+        let mut nums = orig.split_ascii_whitespace().map(|s| s.parse::<u64>());
+        let a = nums.next().unwrap().unwrap();
+        let b = nums.next().unwrap().unwrap();
+        // for n in nums {  println!("  n: {}", n.expect("parserr")); }
+        println!("parsed {a} // {b}");
+
+        one.push(a);
+        two.push(b);
+    }
+
+    // for n in one { println!("one: {n}")};
+    // for n in two { println!("two: {n}")};
+
+    // one.sort();
+    // two.sort();
+    // for n in one.clone() { println!("one: {n}")};
+
+    let mut two_count: HashMap<u64, u64> = HashMap::new();
+
+    for n in two.clone() { 
+        let mut val= 1;
+        val = two_count.get(&n).unwrap_or(&0u64) + 1;
+        two_count.insert(n,val);
+        // println!("two: {n}")
+    };
+
+    // while !one.is_empty() {
+    //     let a = one.pop().expect("pop one") as i64;
+    //     let b = two.pop().expect("pop two") as i64;
+    //     let diff = (a-b).abs();
+    //     println!( " {a} {b} {diff}");
+    //     sum += diff;
     // }
-    return working;
+    for n in one.clone() { 
+        let factor = two_count.get(&n).unwrap_or(&0u64);
+        let distance = n * factor;
+        sum += distance;
+        println!("one: {n} {factor} {distance} {sum}")
+    };
+
+    return sum as u64;
+
 }
 
-fn findfirstnum(line: String) -> u32 {
+fn main() {
+    println!("Hello, world!");
+    let lines = read_lines("./input/sample1.txt");
 
-    let number_map: HashMap<&str, u32> = HashMap::from([
-        ("zero",0),
-        ("one",1),
-        ("two",2),
-        ("three",3),
-        ("four",4),
-        ("five",5),
-        ("six",6),
-        ("seven",7),
-        ("eight",8),
-        ("nine",9),
-    ]);
+    // aicode(lines);
+    // return;
+
+    let lines = read_lines("./input/input_1.txt");
+    let result = process_lines(lines);
+
+    println!("Result of file is: {result} ");
 
 
-    // find first ascii num index
-    let mut idx = line.find(char::is_numeric).unwrap_or(999999);
-    let ss = line.get(idx..idx+1).unwrap_or("0");
-    let mut val = String::from( ss ).parse().expect("badparse");
 
-    // iterate all the strings to find the earliest
-    for each in number_map  {
-        let s = each.0;
-        let v = each.1;
-        let i = line.find(s);
-        if i.is_some_and(|x| x <= idx) {
-            idx = i.unwrap();
-            val = v;
-        }
-    }
-
-    println!("Found first number at index {} value {} ", idx, val );
-
-    return val;
 }
 
-fn findlastnum(line: String) -> u32 {
-
-    let number_map: HashMap<&str, u32> = HashMap::from([
-        ("zero",0),
-        ("one",1),
-        ("two",2),
-        ("three",3),
-        ("four",4),
-        ("five",5),
-        ("six",6),
-        ("seven",7),
-        ("eight",8),
-        ("nine",9),
-    ]);
 
 
-    // find first ascii num index
-    let idx_opt = line.rfind(char::is_numeric);
-    let mut val = 0;
-    let mut idx = 0;
-    if idx_opt.is_some() {
-        idx = idx_opt.unwrap();
-        let ss = line.get(idx..idx+1).expect("bad get");
-        val = String::from( ss ).parse().expect("badparse");
-        // println!("last index of num is idx {} {}", idx, val)
-    }
+// Testing code generate by ChatGPT
+fn aicode(lines : Vec<String>) {
+        // Read input lists
+        let file = File::open("input/sample1.txt");
+        let mut lines = BufReader::new(file.expect("asdf")).lines();
 
-    // let mut val = String::from( ss ).parse().expect("badparse");
+        // Read the first list
+        let left_list: Vec<i32> = lines
+            .next()
+            .expect("Expected a line for the left list")
+            .expect("asdf")
+            .split_whitespace()
+            .map(|x| x.parse().expect("Expected an integer"))
+            .collect();
+        for n in left_list.clone() { println!("one before: {n}")};
+        
+        // Read the second list
+        let right_list: Vec<i32> = lines
+            .next()
+            .expect("Expected a line for the right list")
+            .expect("asdf")
+            .split_whitespace()
+            .map(|x| x.parse().expect("Expected an integer"))
+            .collect();
+    
+        // Sort both lists
+        let mut sorted_left = left_list.clone();
+        sorted_left.sort_unstable();
+        
+    for n in sorted_left.clone() { println!("one: {n}")};
 
-    // iterate all the strings to find the earliest
-    for each in number_map  {
-        let s = each.0;
-        let v = each.1;
-        let i = line.rfind(s);
-        if i.is_some_and(|x| x >= idx) {
-            // println!("last index of updated for {s} num is idx {} {}", idx, val);
-            idx = i.unwrap();
-            val = v;
-        }
-    }
 
-    println!("Found last number at index {} value {} ", idx, val );
-
-    return val;
+        let mut sorted_right = right_list.clone();
+        sorted_right.sort_unstable();
+        
+        // Calculate total distance
+        let total_distance: i32 = sorted_left
+            .iter()
+            .zip(sorted_right.iter())
+            .map(|(a, b)| (a - b).abs())
+            .sum();
+        
+        println!("Total distance: {}", total_distance);
+    
 }
-
