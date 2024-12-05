@@ -115,12 +115,15 @@ pub fn process_lines(lines:Vec<String>) -> u64 {
         let row = lines.get(y).unwrap().as_bytes();
         for x in 0..dimx {
             let c = row[x];
+
+            // Part 1
             // if c == b'X' {
             //     println!("Found an X at {x},{y}");
             //     // search for XMAS from here
             //     let found = search_xmas_8ways(&lines, x, y);
             //     xmascount += found;
             // }
+            // Part 2
             if c == b'A' {
                 println!("Found an A at {x},{y}");
                 // search for XMAS from here
