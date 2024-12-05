@@ -22,12 +22,12 @@ fn test_page_list(pagelist : Vec<i32>, rules : &Vec<(i32,i32)> ) -> bool {
 }
 
 fn fix_pagelist_and_return_middle(pagelist : Vec<i32>, rules : &Vec<(i32,i32)> ) -> i32 {
-    print!("fixing pagelist: ");
-    for pn in pagelist.clone() { print!("{pn} ")};
+    print!("fixing pagelist: {:?}", pagelist);
+    // for pn in pagelist.clone() { print!("{pn} ")};
     
     // break our recursion
     if test_page_list(pagelist.clone(), rules) { 
-        println!("GOOD!!!");  return get_middle_page(pagelist.clone()) 
+        println!(" GOOD!!!");  return get_middle_page(pagelist.clone()) 
     }
     println!("");
 
@@ -68,27 +68,29 @@ pub fn process_lines(lines:Vec<String>) -> u64 {
     let page_lines: Vec<&String> = lines.iter().filter(|l| return l.contains(",")).collect();
 
     // process rules into vec of numbers
-    let mut rules: Vec<(i32,i32)> = Vec::new();
-    rule_lines.iter().for_each(|s| {
-        let mut ruliter = s.split("|").into_iter();
-        let before:i32 = ruliter.next().unwrap().parse().expect("parse before");
-        let after:i32  = ruliter.next().unwrap().parse().expect("parse after");
-        println!("found rule {before} {after}");
-        rules.push( (before,after) );
-    } );
-
+    let rules: Vec<(i32,i32)> = 
+        rule_lines.iter().map(|s| {
+            let mut ruliter = s.split("|").into_iter();
+            ( ruliter.next().unwrap().parse().expect("parse before"),
+              ruliter.next().unwrap().parse().expect("parse after") )
+            // println!("found rule {before} {after}");
+            // (before,after)
+        } ).collect();
+   
 
     // for rl in rule_lines { println!("rule: {rl}")};
     // for pl in page_lines { println!("page: {pl}")};
-    for r in rules.clone() { println!("rule: {} {}", r.0, r.1); }
+    for r in rules.clone() { println!("rule: {:?}", r); }
 
     // test each page
     for pl in page_lines {
         println!("Page List: {pl}");
-        let mut pagelist: Vec<i32> = Vec::new();
-        pl.split(",").for_each(|x| {
-            pagelist.push(x.parse::<i32>().expect("aprse"));
-        });
+        let pagelist: Vec<i32> = pl.split(",").map(|x| {
+            x.parse::<i32>().expect("aprse")
+        }).collect();
+
+
+
     
         let page_list_ok = test_page_list(pagelist.clone(), &rules);
         println!("page list good={page_list_ok} ::: {pl}");
@@ -105,7 +107,7 @@ pub fn process_lines(lines:Vec<String>) -> u64 {
     
 
 
-    println!("corrected page sums is {corrected_page_sums}");
+    println!("PART2: ***** corrected page sums is {corrected_page_sums}");
 
     return correct_row_count as u64;
 
