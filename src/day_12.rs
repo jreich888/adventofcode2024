@@ -2,7 +2,6 @@
 // use std::collections::HashSet;
 // use multimap::MultiMap;
 
-use std::collections::HashMap;
 use std::collections::HashSet;
 
 
@@ -76,6 +75,16 @@ fn calc_perim( region: &HashSet<(i32,i32)> ) -> i32 {
 }
 
 
+#[derive(Eq, Hash, PartialEq)]
+enum SideType {
+    LEFT=1, RIGHT=2, TOP=3, BOTTOM=4
+}
+fn test_side_type() {
+    let mut sides : HashSet<SideType> = HashSet::new();
+    sides.insert(SideType::LEFT);
+}
+
+// Future, use enum type like above
 const LEFT : i32 = 0;
 const RIGHT : i32 = 1;
 const TOP : i32 = 2;
@@ -104,7 +113,7 @@ fn calc_side_id(region: &HashSet<(i32,i32)>, x:i32, y:i32, stype:i32) -> (i32,i3
     let mut dx = 0;
     let mut dy = 0;
     // for this side type, are we iterating up or left?
-    if stype==LEFT || stype==RIGHT { dy = -1; } else { dx=-1; }
+    if [LEFT,RIGHT].contains(&stype) { dy = -1; } else { dx=-1; }
 
     let mut minx = x;
     let mut miny = y;
@@ -149,8 +158,6 @@ fn calc_sides( region: &HashSet<(i32,i32)> ) -> i32 {
 pub fn process_lines(lines:Vec<String>) -> u64 {
   
     let mut plot_map: Vec<Vec<char>> = Vec::new();
-    let mut count_p1 = 0;
-    let mut count_p2 = 0;
 
     // iterate the chars and determine the size of the entire FS
     // Size of FS is sum of numbers
@@ -161,7 +168,7 @@ pub fn process_lines(lines:Vec<String>) -> u64 {
 
     for r in plot_map.clone() {
         let rs: String = r.iter().collect();
-        // println!("{rs}");
+        println!("{}", rs);
     }
 
     let dims: (i32, i32) = (plot_map[0].len() as i32, plot_map.len() as i32);
