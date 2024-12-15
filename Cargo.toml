@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+fmt = "0.1.0"
 geo = "0.29.3"
 multimap = "0.10.0"
 rand  = "0"
