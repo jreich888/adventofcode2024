@@ -5,7 +5,7 @@ use std::{
     path::Path, 
 };
 
-pub mod day_16;
+pub mod day_19;
 
 fn read_lines(filename: impl AsRef<Path>) -> Vec<String> {
     let file = File::open(filename).expect("no such file");
@@ -24,12 +24,12 @@ fn read_lines(filename: impl AsRef<Path>) -> Vec<String> {
 
 fn main() {
     println!("Hello, world!");
-    let inputday : &str = "day16";
+    let inputday : &str = "day19";
     let lines = read_lines(format!("./input/{inputday}/sample1.txt"));
-    let lines = read_lines(format!("./input/{inputday}/sample2.txt"));
+    // let lines = read_lines(format!("./input/{inputday}/sample2.txt"));
     // let lines = read_lines(format!("./input/{inputday}/test2.txt"));
     let lines = read_lines(format!("./input/{inputday}/input_1.txt"));
 
-    let result = day_16::process_lines(lines);
+    let result = day_19::process_lines(lines);
     println!("Result of file is: {result} ");
 }

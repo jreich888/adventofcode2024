@@ -245,8 +245,8 @@ pub fn process_lines(lines:Vec<String>) -> u64 {
         }
 
         runcount += 1;
-        if runcount%10000 == 0 {
-            let pct = runcount / num_a_vals;
+        if runcount%100000 == 0 {
+            let pct = runcount * 100 / num_a_vals;
             println!("tested {runcount} / {num_a_vals}  {pct}% a values.");
         }
 
