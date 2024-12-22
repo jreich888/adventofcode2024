@@ -194,7 +194,7 @@ fn mix(n1:i64, n2:i64) -> i64 { n1^n2 }
 fn prune(n1:i64) -> i64 { n1 % 16777216 }
 
 
-fn calc_secret_number(n: i64) -> i64 {
+fn calc_secret_number(n: i64 ) -> i64 {
     let n1 = n * 64i64;
     let mut sn = prune(mix(n, n1));
     let n2 = sn / 32i64;
@@ -237,20 +237,53 @@ pub fn process_lines(lines:Vec<String>) -> u64 {
 
 
 
+    let mut big_sale_map: HashMap<(i8,i8,i8,i8), i32> = HashMap::new();
+
     let mut sum = 0u64;
     let count = 2000;
     for n in lines {
+        let mut our_seq_set: HashSet<(i8,i8,i8,i8)> = HashSet::new();
+        let mut our_last_four: VecDeque<i8> = VecDeque::new();
         let mut sn: i64 = n.parse().expect("parse error");
+        let sn_orig = sn;
+        let mut prev = (sn_orig%10) as i32;
+        
         for i in 0..count {
             sn = calc_secret_number(sn);
+            let price = (sn % 10) as i32;
+            let delta = price - prev ;
+            prev = price;
+
+            // println!("{i:4} {price} {delta:3} {sn}");
+
+            our_last_four.push_back(delta as i8);
+            if our_last_four.len() > 4 { our_last_four.pop_front(); }
+            if our_last_four.len() == 4 {
+                let key = (our_last_four[0],our_last_four[1],our_last_four[2], our_last_four[3]);
+                if ! our_seq_set.contains(&key) {
+                    our_seq_set.insert(key);
+                    let num = *big_sale_map.get(&key).unwrap_or(&0);
+                    big_sale_map.insert(key,num+price);
+                }
+            }
         }
-        println!("{n}: {sn}");
         sum += sn as u64;
+    }
+
+    let mut max = 0;
+    let mut max_key = (0i8,0i8,0i8,0i8);
+    for v in big_sale_map { 
+        // println!("{} {:?}", v.0, v.1);
+        if v.1 > max {
+            max = v.1;
+            max_key = v.0;
+            println!("Found new max: {max}   for {:?}", max_key);
+        }
     }
     
 
 
-    return sum;
+    return max as u64;
 
 
 
