@@ -130,8 +130,6 @@ fn arrow_keypad_move(from: char, to: char) -> String {
     // if cache.contains_key(&(from,to)) {
     //     return (*cache.get(&(from,to)).unwrap()).clone();
     // }
-
-
     let start = arrow_keypad_char_to_pos(from);
     let end = arrow_keypad_char_to_pos(to);
     let mut command = String::new().to_owned();
@@ -143,7 +141,55 @@ fn arrow_keypad_move(from: char, to: char) -> String {
     if diff.y < 0 { command = command + "^".repeat(diff.y.abs() as usize).as_str(); }
 
     return command;
+
 }
+
+
+fn arrow_keypad_move_p2(from: char, to: char) -> Vec<String> {
+
+    let start = arrow_keypad_char_to_pos(from);
+    let end = arrow_keypad_char_to_pos(to);
+    // let mut command = String::new().to_owned();
+
+    let diff = end-start;
+
+    // println!("  arrow_keypad_move_p2 {:?} {:?} {:?} ", from, to, diff);
+    // println!("  arrow_keypad_move_p2 {:?} {:?} {:?} ", start, end, diff);
+    // if diff.y > 0 { command = command + "v".repeat(diff.y as usize).as_str(); }
+    // if diff.x < 0 { command = command + "<".repeat(diff.x.abs() as usize).as_str(); }
+    // if diff.x > 0 { command = command + ">".repeat(diff.x as usize).as_str(); }
+    // if diff.y < 0 { command = command + "^".repeat(diff.y.abs() as usize).as_str(); }
+
+    let mut hsteps = (if diff.x<0 {"<"} else {">"}).repeat(diff.x.abs() as usize);
+    let mut vsteps = (if diff.y<0 {"^"} else {"v"}).repeat(diff.y.abs() as usize);
+
+
+    // println!("slns: {from} {to} H{hsteps}  V{vsteps}  {:?}",diff);
+    let sln1 = vsteps.to_string() + hsteps.as_str() + "A";
+    let sln2 = hsteps.to_string() + vsteps.as_str() + "A";
+    // println!("slns: {from} {to} {sln1}  {sln2}  {:?}",diff);
+
+    // if they are the same, must be legal, only return one here
+    if sln1.eq(&sln2) {
+        return vec![sln1];
+    }
+
+    // could we have illegal case here?
+    if start.y==0 && end.x==0 {
+        // remove one of the cases...
+        return vec![ sln1 ];
+    }
+    if start.x==0 && end.y==0 {
+        // remove the other case...
+        return vec![ sln2 ];
+    }
+    // otherwise return both
+    return vec![sln1,sln2];
+
+
+    // return command;
+}
+
 
 fn move_on_arrow_keypad(code: &String) -> String {
     let mut moves = String::new();
@@ -161,21 +207,10 @@ fn move_on_arrow_keypad(code: &String) -> String {
 }
 
 
-fn move_on_arrow_keypad_depth(pos: char, dest: char, depth: i32, cache : &mut HashMap<(char,char,i32),i64>) -> i64 {
-
-    println!("move_on_arrow_keypad_depth from {pos} to {dest} depth {depth}");
-
-    if cache.contains_key(&(pos,dest,depth)) {
-        println!("  CACHE HIT {}",*cache.get(&(pos,dest,depth)).unwrap());
-        return *cache.get(&(pos,dest,depth)).unwrap();
-    }
-
-    let mut moves = arrow_keypad_move(pos, dest) + "A";
-    println!("moves: {pos} {dest} {depth}:  {moves}");
-
+fn move_on_arrow_keypad_depth_inner(pos: char, dest: char, depth: i32, moves: &String, cache : &mut HashMap<(char,char,i32),i64>) -> i64 {
+    let mut total = 0i64;
     if (depth == 1) { return moves.len() as i64; }
 
-    let mut total = 0i64;
 
     // Assume we're always on A, since we alway pressed an A last
     let mut curpos = 'A';
@@ -185,9 +220,31 @@ fn move_on_arrow_keypad_depth(pos: char, dest: char, depth: i32, cache : &mut Ha
         curpos = c;
     }
 
-    cache.insert((pos,dest,depth), total);
 
     return total;
+}
+fn move_on_arrow_keypad_depth(pos: char, dest: char, depth: i32, cache : &mut HashMap<(char,char,i32),i64>) -> i64 {
+
+    // println!("move_on_arrow_keypad_depth from {pos} to {dest} depth {depth}");
+
+    if cache.contains_key(&(pos,dest,depth)) {
+        // println!("  CACHE HIT {}",*cache.get(&(pos,dest,depth)).unwrap());
+        return *cache.get(&(pos,dest,depth)).unwrap();
+    }
+
+    let mut moves = arrow_keypad_move_p2(pos, dest);
+    println!("moves: {pos} {dest} {depth}:  {:?}", moves);
+    let mut ans = move_on_arrow_keypad_depth_inner(pos, dest, depth, &moves[0], cache);
+
+    if moves.len() == 2 {
+        let a2 =  move_on_arrow_keypad_depth_inner(pos, dest, depth, &moves[1], cache);
+        ans = ans.min(a2);
+    }
+    
+    cache.insert((pos,dest,depth), ans);
+
+    return ans;
+
 }
 
 
@@ -205,7 +262,14 @@ pub fn process_lines(lines:Vec<String>) -> u64 {
         println!("{:?}", num_keypad_move('9', 'A'));
         println!("{:?}", num_keypad_move('0', '1'));
         println!("{:?}", num_keypad_move('1', '0'));
+
+        println!("{:?}", arrow_keypad_move_p2('<', '^'));
+        println!("{:?}", arrow_keypad_move_p2('^', '<'));
+
+        // return 0u64;
+
     }
+
 
 
 
@@ -227,6 +291,8 @@ pub fn process_lines(lines:Vec<String>) -> u64 {
     let mut allmoves : String = String::new();
     for l in lines {
         codes.push(l.clone().to_string());
+
+        // P1 work =======================
 
         println!("Code: {l}");
         // let mut pos = 'A';
@@ -268,7 +334,7 @@ pub fn process_lines(lines:Vec<String>) -> u64 {
                 for c2 in m.chars() {
                 // let mut longcode = m2;
                     let l = move_on_arrow_keypad_depth(pos2,c2,depth,&mut cache);
-                    println!("MOVING {pos2} {c2} top=2 size={l}");
+                    // println!("MOVING {pos2} {c2} top={depth} size={l}");
                     size += l;
                     pos2 = c2;
                 }
@@ -296,17 +362,18 @@ pub fn process_lines(lines:Vec<String>) -> u64 {
 
 
     }
-    println!("All Moves: {allmoves}");
+    // println!("All Moves: {allmoves}");
 
-    println!("moves for <<^^:  {}", move_on_arrow_keypad(&"<<^^".to_string()));
-    println!("moves for ^^<<:  {}", move_on_arrow_keypad(&"^^<<".to_string()));
-    println!("moves for <<^^A: {}", move_on_arrow_keypad(&"<<^^A".to_string()));
-    println!("moves for ^^<<A: {}", move_on_arrow_keypad(&"^^<<A".to_string()));
-    println!("2xves for <<^^A: {}", move_on_arrow_keypad(&move_on_arrow_keypad(&"<<^^A".to_string())));
-    println!("2xves for ^^<<A: {}", move_on_arrow_keypad(&move_on_arrow_keypad(&"^^<<A".to_string())));
+    if (false) {
+        println!("moves for <<^^:  {}", move_on_arrow_keypad(&"<<^^".to_string()));
+        println!("moves for ^^<<:  {}", move_on_arrow_keypad(&"^^<<".to_string()));
+        println!("moves for <<^^A: {}", move_on_arrow_keypad(&"<<^^A".to_string()));
+        println!("moves for ^^<<A: {}", move_on_arrow_keypad(&"^^<<A".to_string()));
+        println!("2xves for <<^^A: {}", move_on_arrow_keypad(&move_on_arrow_keypad(&"<<^^A".to_string())));
+        println!("2xves for ^^<<A: {}", move_on_arrow_keypad(&move_on_arrow_keypad(&"^^<<A".to_string())));
+    }
 
-
-
+    println!("test result:                 {score}");
 
 
     // unsafe { score = LOW_SCORE; }
